@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space heat math - calculators</title>
+<style>
+  :root { --accent: #a33a2a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f4f6f8; color: #24282c; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 14px; max-width: 640px; }
+  .note { background: #fff; border: 1px solid #d8dfe6; border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; font-size: 0.9rem; margin: 0 0 28px; max-width: 720px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #d8dfe6; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #727e88; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #b3bfc9; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #98a2ab; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Space heat math</h1>
+  <p class="lede">The room names the watts, the watts name the breaker, and the breaker names the bill. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="note">Illustrative planning arithmetic only. Every rate is a labeled default. A plug-in heater belongs in the wall outlet, never a power strip or an extension cord, with a clear meter around it and off when the room is empty. Real warmth starts with socks and sealed windows; the heater is the last meter of comfort, not the first.</div>
+  <div class="grid">
+    <section>
+      <h2>Watt plan</h2>
+      <p class="hint">The room names the watts.</p>
+      <label for="w-a">Room area (m2)</label>
+      <input id="w-a" type="number" value="12" min="0" step="1">
+      <label for="w-c">Ceiling height (m)</label>
+      <input id="w-c" type="number" value="2.4" min="0" step="0.1">
+      <button id="w-go">Size the heater</button>
+      <div class="out" id="w-out"></div>
+    </section>
+    <section>
+      <h2>Circuit plan</h2>
+      <p class="hint">The watts name the breaker.</p>
+      <label for="k-w">Heater watts (W)</label>
+      <input id="k-w" type="number" value="1500" min="0" step="50">
+      <label for="k-a">Breaker size (A)</label>
+      <input id="k-a" type="number" value="15" min="0" step="5">
+      <button id="k-go">Check the circuit</button>
+      <div class="out" id="k-out"></div>
+    </section>
+    <section>
+      <h2>Cost plan</h2>
+      <p class="hint">The breaker names the bill.</p>
+      <label for="c-w">Heater watts (W)</label>
+      <input id="c-w" type="number" value="1200" min="0" step="50">
+      <label for="c-h">Hours a day (h)</label>
+      <input id="c-h" type="number" value="4" min="0" step="1">
+      <button id="c-go">Price the month</button>
+      <div class="out" id="c-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/spaceheatmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('w-go').addEventListener('click', function(){
+  var a=[num('w-a'),num('w-c')];
+  show('w-out', SpaceHeatMath.wattPlan.apply(null,a), function(r){ return SpaceHeatMath.renderWatt.apply(null,[r].concat(a)); });
+});
+document.getElementById('k-go').addEventListener('click', function(){
+  var a=[num('k-w'),num('k-a')];
+  show('k-out', SpaceHeatMath.circuitPlan.apply(null,a), function(r){ return SpaceHeatMath.renderCircuit.apply(null,[r].concat(a)); });
+});
+document.getElementById('c-go').addEventListener('click', function(){
+  var a=[num('c-w'),num('c-h')];
+  show('c-out', SpaceHeatMath.costPlan.apply(null,a), function(r){ return SpaceHeatMath.renderCost.apply(null,[r].concat(a)); });
+});
+</script>
+</body>
+</html>
